@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { Trophy } from 'lucide-react';
+"use client";
+
+import { useEffect, useState } from "react";
+import { getSupabase } from "@/lib/supabase";
+import { Trophy } from "lucide-react";
 
 interface Submission {
   id: string;
@@ -18,14 +20,20 @@ export default function SubmissionsList({ cycleNumber }: SubmissionsListProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
 
     const fetchSubmissions = async () => {
-      const { data, error } = await supabase
-        .from('game_submissions')
-        .select('id, email, submission_order, submitted_at')
-        .eq('cycle_number', cycleNumber)
-        .order('submission_order', { ascending: true });
+      const { data } = await supabase
+        .from("game_submissions")
+        .select("id, email, submission_order, submitted_at")
+        .eq("cycle_number", cycleNumber)
+        .order("submission_order", { ascending: true });
 
       if (data) {
         setSubmissions(data);
@@ -42,11 +50,11 @@ export default function SubmissionsList({ cycleNumber }: SubmissionsListProps) {
         },
       })
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'game_submissions',
+          event: "INSERT",
+          schema: "public",
+          table: "game_submissions",
           filter: `cycle_number=eq.${cycleNumber}`,
         },
         (payload) => {
@@ -54,7 +62,9 @@ export default function SubmissionsList({ cycleNumber }: SubmissionsListProps) {
             const newSubmission = payload.new as Submission;
             const exists = prev.some((s) => s.id === newSubmission.id);
             if (!exists) {
-              return [...prev, newSubmission].sort((a, b) => a.submission_order - b.submission_order);
+              return [...prev, newSubmission].sort(
+                (a, b) => a.submission_order - b.submission_order
+              );
             }
             return prev;
           });

@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
-import { getGamePhase, formatTime, GamePhase } from '../lib/gameTimer';
-import EmailSubmissionForm from './EmailSubmissionForm';
-import SubmissionsList from './SubmissionsList';
+"use client";
+
+import { useEffect, useState } from "react";
+import { getGamePhase, formatTime, GamePhase } from "@/lib/gameTimer";
+import EmailSubmissionForm from "./EmailSubmissionForm";
+import SubmissionsList from "./SubmissionsList";
 
 export default function GamePhaseDisplay() {
   const [gamePhase, setGamePhase] = useState<GamePhase | null>(null);
@@ -24,7 +26,7 @@ export default function GamePhaseDisplay() {
 
   return (
     <div className="w-full">
-      {gamePhase.phase === 'countdown' && (
+      {gamePhase.phase === "countdown" && (
         <div className="space-y-8">
           <div className="text-center space-y-4">
             <h2 className="text-xl font-bold text-cyan-400 uppercase tracking-widest">
@@ -37,7 +39,7 @@ export default function GamePhaseDisplay() {
         </div>
       )}
 
-      {gamePhase.phase === 'submission' && (
+      {gamePhase.phase === "submission" && (
         <div className="space-y-8">
           <div className="text-center space-y-2">
             <h2 className="text-xl font-bold text-red-500 uppercase tracking-widest animate-pulse">
@@ -54,15 +56,21 @@ export default function GamePhaseDisplay() {
         </div>
       )}
 
-      {gamePhase.phase === 'wait' && (
+      {gamePhase.phase === "wait" && (
         <div className="space-y-8">
           <div className="text-center space-y-4">
-            <h2 className="text-xl font-bold text-blue-400 uppercase tracking-widest">
-              Round In Progress
+            <h2 className="text-xl font-bold text-yellow-400 uppercase tracking-widest">
+              Submission Closed
             </h2>
-            <p className="text-gray-400">Next submission window opens in:</p>
-            <div className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 font-mono">
+            <p className="text-gray-400">Processing round results...</p>
+            <p className="text-sm text-gray-500">Next countdown begins in:</p>
+            <div className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400 font-mono">
               {formatTime(gamePhase.timeRemaining)}
+            </div>
+            <div className="mt-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+              <p className="text-yellow-400 text-sm">
+                2-minute wait period before next round
+              </p>
             </div>
           </div>
 

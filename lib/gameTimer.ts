@@ -1,10 +1,10 @@
-const CYCLE_DURATION = 7 * 60 * 1000; // 7 minutes in milliseconds
 const COUNTDOWN_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 const SUBMISSION_DURATION = 2 * 60 * 1000; // 2 minutes in milliseconds
 const WAIT_DURATION = 2 * 60 * 1000; // 2 minutes in milliseconds
+const CYCLE_DURATION = COUNTDOWN_DURATION + SUBMISSION_DURATION + WAIT_DURATION; // 9 minutes total
 
 export interface GamePhase {
-  phase: 'countdown' | 'submission' | 'wait';
+  phase: "countdown" | "submission" | "wait";
   timeRemaining: number; // in milliseconds
   cycleNumber: number;
 }
@@ -17,17 +17,17 @@ export function getGamePhase(serverTime: number): GamePhase {
   const cyclePosition = timeSinceStart % CYCLE_DURATION;
   const cycleNumber = Math.floor(timeSinceStart / CYCLE_DURATION);
 
-  let phase: 'countdown' | 'submission' | 'wait';
+  let phase: "countdown" | "submission" | "wait";
   let timeRemaining: number;
 
   if (cyclePosition < COUNTDOWN_DURATION) {
-    phase = 'countdown';
+    phase = "countdown";
     timeRemaining = COUNTDOWN_DURATION - cyclePosition;
   } else if (cyclePosition < COUNTDOWN_DURATION + SUBMISSION_DURATION) {
-    phase = 'submission';
+    phase = "submission";
     timeRemaining = COUNTDOWN_DURATION + SUBMISSION_DURATION - cyclePosition;
   } else {
-    phase = 'wait';
+    phase = "wait";
     timeRemaining = CYCLE_DURATION - cyclePosition;
   }
 
@@ -44,5 +44,5 @@ export function formatTime(milliseconds: number): string {
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
 
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }

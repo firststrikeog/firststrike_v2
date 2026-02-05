@@ -1,6 +1,8 @@
-import GamePhaseDisplay from './components/GamePhaseDisplay';
+"use client";
 
-function App() {
+import GamePhaseDisplay from "@/components/GamePhaseDisplay";
+
+export default function Home() {
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden relative">
       <div className="fixed inset-0 pointer-events-none">
@@ -31,7 +33,9 @@ function App() {
             </div>
 
             <div className="text-center text-xs text-gray-600 space-y-2">
-              <p  className="text-lg md:text-xl text-red-400 bold font-light">Each cycle: 5m countdown + 2m submission + 2m wait</p>
+              <p className="text-lg md:text-xl text-red-400 font-medium">
+                Each cycle: 5m countdown + 2m submission + 2m wait
+              </p>
               <p>Times are synchronized globally for all participants</p>
             </div>
           </div>
@@ -40,5 +44,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

@@ -1,38 +1,48 @@
-import { useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { Send } from 'lucide-react';
+"use client";
+
+import { useState } from "react";
+import { getSupabase } from "@/lib/supabase";
+import { Send } from "lucide-react";
 
 interface EmailSubmissionFormProps {
   cycleNumber: number;
 }
 
-export default function EmailSubmissionForm({ cycleNumber }: EmailSubmissionFormProps) {
-  const [email, setEmail] = useState('');
+export default function EmailSubmissionForm({
+  cycleNumber,
+}: EmailSubmissionFormProps) {
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email) {
-      setError('Email is required');
+      setError("Email is required");
+      return;
+    }
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      setError("Database not configured");
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       const { data: round } = await supabase
-        .from('game_rounds')
-        .select('id')
-        .eq('cycle_number', cycleNumber)
+        .from("game_rounds")
+        .select("id")
+        .eq("cycle_number", cycleNumber)
         .maybeSingle();
 
       if (!round) {
         const { data: newRound } = await supabase
-          .from('game_rounds')
+          .from("game_rounds")
           .insert({
             cycle_number: cycleNumber,
             round_start_time: new Date().toISOString(),
@@ -40,10 +50,10 @@ export default function EmailSubmissionForm({ cycleNumber }: EmailSubmissionForm
           .select()
           .single();
 
-        if (!newRound) throw new Error('Failed to create round');
+        if (!newRound) throw new Error("Failed to create round");
 
         const { error: submitError } = await supabase
-          .from('game_submissions')
+          .from("game_submissions")
           .insert({
             round_id: newRound.id,
             cycle_number: cycleNumber,
@@ -52,24 +62,24 @@ export default function EmailSubmissionForm({ cycleNumber }: EmailSubmissionForm
           });
 
         if (submitError) {
-          if (submitError.code === '23505') {
-            setError('Email already submitted this round!');
+          if (submitError.code === "23505") {
+            setError("Email already submitted this round!");
           } else {
-            setError('Failed to submit email');
+            setError("Failed to submit email");
           }
         } else {
           setSubmitted(true);
-          setEmail('');
+          setEmail("");
           setTimeout(() => setSubmitted(false), 2000);
         }
       } else {
         const { data: submissions } = await supabase
-          .from('game_submissions')
-          .select('id', { count: 'exact' })
-          .eq('round_id', round.id);
+          .from("game_submissions")
+          .select("id", { count: "exact" })
+          .eq("round_id", round.id);
 
         const { error: submitError } = await supabase
-          .from('game_submissions')
+          .from("game_submissions")
           .insert({
             round_id: round.id,
             cycle_number: cycleNumber,
@@ -78,19 +88,19 @@ export default function EmailSubmissionForm({ cycleNumber }: EmailSubmissionForm
           });
 
         if (submitError) {
-          if (submitError.code === '23505') {
-            setError('Email already submitted this round!');
+          if (submitError.code === "23505") {
+            setError("Email already submitted this round!");
           } else {
-            setError('Failed to submit email');
+            setError("Failed to submit email");
           }
         } else {
           setSubmitted(true);
-          setEmail('');
+          setEmail("");
           setTimeout(() => setSubmitted(false), 2000);
         }
       }
     } catch (err) {
-      setError('An error occurred');
+      setError("An error occurred");
       console.error(err);
     } finally {
       setLoading(false);
@@ -113,14 +123,19 @@ export default function EmailSubmissionForm({ cycleNumber }: EmailSubmissionForm
           disabled={loading || submitted}
           className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 text-white font-bold uppercase tracking-wider hover:from-red-500 hover:to-red-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 group"
         >
-          <Send size={18} className="group-hover:translate-x-1 transition-transform" />
-          {loading ? 'Sending...' : submitted ? 'Sent!' : 'Enter'}
+          <Send
+            size={18}
+            className="group-hover:translate-x-1 transition-transform"
+          />
+          {loading ? "Sending..." : submitted ? "Sent!" : "Enter"}
         </button>
       </div>
 
       {error && <p className="text-red-500 text-sm font-mono">{error}</p>}
       {submitted && (
-        <p className="text-cyan-400 text-sm font-mono animate-pulse">Email submitted successfully!</p>
+        <p className="text-cyan-400 text-sm font-mono animate-pulse">
+          Email submitted successfully!
+        </p>
       )}
     </form>
   );
