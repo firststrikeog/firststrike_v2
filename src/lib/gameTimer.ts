@@ -1,7 +1,7 @@
-const CYCLE_DURATION = 7 * 60 * 1000; // 7 minutes in milliseconds
 const COUNTDOWN_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 const SUBMISSION_DURATION = 2 * 60 * 1000; // 2 minutes in milliseconds
 const WAIT_DURATION = 2 * 60 * 1000; // 2 minutes in milliseconds
+const CYCLE_DURATION = COUNTDOWN_DURATION + SUBMISSION_DURATION + WAIT_DURATION; // 9 minutes total
 
 export interface GamePhase {
   phase: 'countdown' | 'submission' | 'wait';
