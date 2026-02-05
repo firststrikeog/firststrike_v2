@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { Send } from "lucide-react";
 
 interface EmailSubmissionFormProps {
@@ -21,6 +21,12 @@ export default function EmailSubmissionForm({
 
     if (!email) {
       setError("Email is required");
+      return;
+    }
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      setError("Database not configured");
       return;
     }
 

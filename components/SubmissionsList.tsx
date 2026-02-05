@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { Trophy } from "lucide-react";
 
 interface Submission {
@@ -20,10 +20,16 @@ export default function SubmissionsList({ cycleNumber }: SubmissionsListProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
 
     const fetchSubmissions = async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("game_submissions")
         .select("id, email, submission_order, submitted_at")
         .eq("cycle_number", cycleNumber)
